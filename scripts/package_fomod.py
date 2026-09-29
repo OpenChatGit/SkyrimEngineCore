@@ -16,7 +16,7 @@ CORE_DIR = os.path.join(STAGE_DIR, "00_Core")
 COMPAT_DIR = os.path.join(STAGE_DIR, "01_Compatibility_po3_Tweaks")
 BUILD_DLL = os.path.join(SKYCORE_ROOT, "build", "SkyCore.dll")
 
-VERSION = "0.3.7"
+VERSION = "0.3.9"
 
 def create_fomod_package():
     if os.path.exists(STAGE_DIR):
