@@ -113,7 +113,7 @@ namespace SkyCore::Modules::Display
                     try { out.targetFPS = std::stoi(val); } catch (...) {}
                 }
             } else if (currentSection == "[Engine]") {
-                if (key == "bAltF4QuitFix" || key == "altf4quitfix" || key == "df4quitfix" || key == "bdf4quitfix") {
+                if (key == "bAltF4QuitFix" || key == "altf4quitfix") {
                     Config::Get().altF4QuitFix = (val == "1" || val == "true");
                 }
             }

@@ -7,32 +7,32 @@
 ## ✦ Features
 
 - **File Handle Expansion (8,192 MaxStdIO):** Eliminates missing-mesh and texture loading crashes in heavy modlists by multiplying available file descriptors.
-- **SafeExit & Quick Termination:** Prevents freeze-on-exit and allows closing Skyrim immediately with Alt+F4.
+- **SafeExit & Alt+F4 Quick Termination:** Prevents freeze-on-exit and allows closing Skyrim cleanly and immediately with Alt+F4.
 - **Automated Co-Save Purge:** Automatically detects and purges orphaned `.skse` co-saves without matching `.ess` save files.
-- **Actor Movement & Lip-Sync Scaler:** Expands active moving actor cap to 256 and simultaneous facial morph / lip-sync cap to 64 actors.
+- **Lip-Sync Expansion:** Expands simultaneous dialogue facial morph / lip-sync cap to 64 actors (engine INI limit).
 - **High-Refresh Dynamic Havok Physics:** High-framerate physics timescale scaling (>60 FPS / 144Hz / 240Hz) preventing physics glitching and camera stutter.
 - **Engine Integrity Patches:** Fixes temporary effect NiRTTI inheritance memory crashes and particle shader depth writing.
 - **Native Diagnostics & Self-Test:** Automatic startup self-test report in `SkyCore.log` and lightweight VEH crash handler with register and module dump.
-- **In-Game Hardware Monitor & OSD:** Native DirectX 11 / ImGui overlay with hotkey toggling and SkyUI MCM configuration.
+- **Native FPS Counter & In-Game OSD:** Dedicated click-through layered Win32 overlay with DXGI swapchain timing, hotkey toggle (Insert), and SkyUI MCM configuration.
 
 ---
 
-## ✦ Feature Comparison Matrix
+## ✦ Features Overview
 
-| Feature / Fix | Legacy SSE Engine Fixes | Legacy SSE Display Tweaks | Legacy po3_Tweaks | **Skyrim Engine Core (SEC)** |
-| :--- | :---: | :---: | :---: | :---: |
-| **MaxStdIO File Descriptors (8192)** |  (Part 1 + 2) | ❌ | ❌ | ** Native C++ (Single DLL)** |
-| **SafeExit (Instant Desktop Exit)** |  | ❌ | ❌ | ** Integrated** |
-| **Dynamic Havok High-FPS Physics** | ❌ |  | ❌ | ** Integrated** |
-| **Borderless Fullscreen DXGI Fix** | ❌ |  | ❌ | ** Integrated** |
-| **V-Sync Override & Frame Limiter** | ❌ |  | ❌ | ** Integrated** |
-| **Actor Limit (256 Movers / 64 Morphs)** | ❌ | ❌ | ❌ | ** Integrated** |
-| **Dynamic Merchant Gold Scaling** | ❌ | ❌ | ❌ | ** Integrated** |
-| **Clean SKSE Co-Saves** |  | ❌ | ❌ | ** Integrated** |
-| **po3_Tweaks Papyrus Hook (`IsTweakInstalled`)**| ❌ | ❌ |  | ** Native C++ Emulation** |
-| **MCM Helper In-Game Config** | ❌ | ❌ | ❌ | ** (EN / DE localized)** |
-| **VEH Lightweight Crash Logger** | ❌ | ❌ | ❌ | ** Integrated** |
-| **Skyrim AE 1.7.104+ Compatibility** | ⚠️ Partial | ⚠️ Partial | ⚠️ Partial | ** 100% Native & Tested** |
+| Feature / Fix | Skyrim Engine Core (SEC) | Description |
+| :--- | :---: | :--- |
+| **MaxStdIO File Descriptors (8192)** |  **Native C++** | Eliminates file handle exhaustion crashes |
+| **SafeExit (Instant Desktop Exit)** |  **Integrated** | Subclassed Win32 message handling for clean exit |
+| **Dynamic Havok High-FPS Physics** |  **Integrated** | Physics delta unlocked up to 240 FPS |
+| **Native Borderless Fullscreen** |  **Integrated** | Win32 borderless monitor bounds positioning |
+| **V-Sync Override & Frame Timing** |  **Integrated** | DXGI SwapChain Present hook for unlocked tearing |
+| **Native In-Game FPS Counter** |  **Integrated** | Transparent click-through HUD overlay (Insert toggle) |
+| **Dynamic Merchant Gold Scaling** |  **Integrated** | Organically scales merchant gold with player speech |
+| **Clean SKSE Co-Saves** |  **Integrated** | Automatically purges orphaned .skse save files |
+| **po3_Tweaks Papyrus Hook** |  **Native C++** | Emulates `po3_Tweaks.IsTweakInstalled` for dependent mods |
+| **MCM Helper In-Game Config** |  **Included** | Full SkyUI MCM with English and German translations |
+| **VEH Lightweight Crash Logger** |  **Integrated** | Vectored exception handling register & module dump |
+| **Skyrim AE 1.7.104+ Compatibility** |  **100% Native** | Tested and verified on the latest Steam runtime |
 
 ---
 
@@ -64,12 +64,9 @@ Skyrim Engine Core comes pre-configured with safe, optimal defaults:
 
 This project is licensed under the **GNU General Public License v3.0 (GPLv3)**.
 
-All research, open-source logic, and memory reverse-engineering utilized in this project operate strictly within the legal scope of the **GNU General Public License v3.0** and the **MIT License**. The rights granted by the original copyright holders under these licenses are legally binding and cannot be diminished or superseded by third parties.
+All research, open-source logic, and memory reverse-engineering utilized in this project operate strictly within the legal scope of the **GNU General Public License v3.0** and the **MIT License**.
 
 Acknowledgements to the open-source reverse-engineering community:
 - aers, Nukem, Ryan (fudgyduff)
-- SlavicPotato
 - powerofthree
-- KernalsEgg
-- D7ry
 - ianpatt, behippo, scripthoge, CharmedBaryon

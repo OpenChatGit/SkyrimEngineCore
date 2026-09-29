@@ -34,7 +34,7 @@ def create_fomod_package():
   <Name>Skyrim Engine Core (SEC) - Unified Master Engine Suite</Name>
   <Author>Nicol</Author>
   <Version>{VERSION}</Version>
-  <Description>Unified master engine suite for Skyrim AE 1.7.104+. Directly replaces SSE Engine Fixes (Nexus #17230), SSE Display Tweaks (Nexus #34705), powerofthree's Tweaks (Nexus #51073), and Actor Limit Fix (Nexus #32349). Native Papyrus compatibility hooks and optional script stubs ensure seamless compatibility with dependent mods.</Description>
+  <Description>Unified master engine suite for Skyrim AE 1.7.104+. Consolidates high-performance engine fixes, native borderless fullscreen, unlocked high-refresh DXGI timing, and gameplay enhancements into a single native C++ SKSE plugin.</Description>
   <Website>https://github.com/OpenChatGit/SkyrimEngineCore/releases</Website>
   <Id>SkyrimEngineCore</Id>
 </fomod>"""
@@ -97,10 +97,9 @@ bFixEffectShaderZBuffer = false   # Shader patch disabled for 1.7.104 compatibil
 bFixDistantRefLoadCrash = false   # Disabled: prevents fade-node offset conflict in 1.7.104
 bFixMemoryAccess = false          # Disabled: uses 1.6.640 specific assembly offset
 bFixGlobalTime = true             # Fixes slow-motion camera and animation synchronization
-bAltF4QuitFix = true              # Allows cleanly closing Skyrim immediately with Alt+F4 (df4quitfix)
-bFixActorLimit = true             # Increases NPC movement cap (256) and face morph limit (64)
-iActorMoverLimit = 256            # Max actively moving actors in loaded cell (Vanilla = 128)
-iActorMorphLimit = 64             # Max simultaneous facial expressions / lip-sync (Vanilla = 10)
+bAltF4QuitFix = true              # Allows cleanly closing Skyrim immediately with Alt+F4
+bFixLipSyncLimit = true           # Expands simultaneous facial morph / lip-sync cap (64)
+iFaceGenMorphLimit = 64           # Max simultaneous facial expressions / lip-sync (Vanilla = 10)
 
 [Gameplay]
 bDynamicMerchantGold = true       # Händler-Gold skaliert organisch mit Spielerlevel & Redekunst
@@ -180,6 +179,12 @@ bVerboseLogging = false           # Detailed debug logs in Documents\\My Games\\
     if os.path.exists(compat_script_src):
         shutil.copy2(compat_script_src, os.path.join(COMPAT_DIR, "scripts", "po3_Tweaks.pex"))
         print("[+] Successfully bundled optional po3_Tweaks.pex compatibility stub")
+
+    # Copy LICENSE into root of distribution
+    license_src = os.path.join(SKYCORE_ROOT, "LICENSE")
+    if os.path.exists(license_src):
+        shutil.copy2(license_src, os.path.join(STAGE_DIR, "LICENSE"))
+        print("[+] Successfully bundled LICENSE")
 
     # Create zip archive for Vortex / Mod Organizer 2
     zip_path = os.path.join(DIST_DIR, f"SkyrimEngineCore-v{VERSION}-AE.zip")

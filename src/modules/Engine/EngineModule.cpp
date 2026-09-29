@@ -133,38 +133,6 @@ namespace SkyCore::Modules::Engine
         inline bool IsPatched() { return s_cellInitPatched; }
     }
 
-    namespace ActorLimitFix
-    {
-        static bool s_moverPatched = false;
-
-        inline void Install(uint32_t a_moverLimit)
-        {
-            try {
-                REL::Relocation<std::uintptr_t> func{ RELOCATION_ID(40296, 41306) };
-                if (!func.address()) {
-                    logger::warn("ActorLimitFix: ID 41306 not found in Address Library");
-                    return;
-                }
-
-                auto* pMov = reinterpret_cast<uint8_t*>(func.address() + 0x92);
-                auto* pCmp = reinterpret_cast<uint8_t*>(func.address() + 0x9E);
-
-                if (*pMov == 0xBE && *pCmp == 0x3D) {
-                    REL::safe_write(func.address() + 0x92 + 1, a_moverLimit);
-                    REL::safe_write(func.address() + 0x9E + 1, a_moverLimit);
-                    s_moverPatched = true;
-                    logger::info("ActorLimitFix: Successfully patched actor mover limit to {}", a_moverLimit);
-                } else {
-                    logger::warn("ActorLimitFix: Opcode mismatch at func+0x92 (0x{:02X}) or func+0x9E (0x{:02X})", *pMov, *pCmp);
-                }
-            } catch (const std::exception& e) {
-                logger::warn("ActorLimitFix: Exception during patch: {}", e.what());
-            }
-        }
-
-        inline bool IsMoverPatched() { return s_moverPatched; }
-    }
-
     void Install()
     {
         const auto& cfg = Config::Get();
@@ -189,10 +157,6 @@ namespace SkyCore::Modules::Engine
             CellInit::Install();
         }
 
-        if (cfg.fixActorLimit) {
-            ActorLimitFix::Install(cfg.actorMoverLimit);
-        }
-
         logger::info("EngineModule: Verified engine patches and fixes initialized");
     }
 
@@ -200,12 +164,12 @@ namespace SkyCore::Modules::Engine
     {
         const auto& cfg = Config::Get();
 
-        // 1. Actor Limit Fix (Morph / Lips)
-        if (cfg.fixActorLimit) {
+        // 1. Dialogue Lip-Sync FaceGen Morph setting (Vanilla engine INI limit)
+        if (cfg.fixLipSyncLimit) {
             if (const auto ini = RE::INISettingCollection::GetSingleton()) {
                 if (const auto setting = ini->GetSetting("uiNumActorsAllowedToMorph:FaceGen")) {
-                    setting->data.u = cfg.actorMorphLimit;
-                    logger::info("EngineModule: uiNumActorsAllowedToMorph:FaceGen set to {} (Morph Limit Fix)", setting->data.u);
+                    setting->data.u = cfg.faceGenMorphLimit;
+                    logger::info("EngineModule: uiNumActorsAllowedToMorph:FaceGen set to {} (Lip-Sync Fix)", setting->data.u);
                 }
             }
         }
@@ -246,21 +210,17 @@ namespace SkyCore::Modules::Engine
         // 6. CellInit Crash Fix
         LogResult("CellInit Crash Fix", cfg.fixCellInit && CellInit::IsPatched(), "Uninitialized form ID callsite verified (0xE8)");
 
-        // 7. Actor Limit Fix (Mover)
-        LogResult("Actor Limit Fix (Mover)", cfg.fixActorLimit && ActorLimitFix::IsMoverPatched(), std::format("Active mover limit: {}", cfg.actorMoverLimit));
-
-        // 8. Actor Limit Fix (Morph)
+        // 7. Dialogue Lip-Sync FaceGen Morph limit
         uint32_t morphVal = 10;
         if (const auto ini = RE::INISettingCollection::GetSingleton()) {
             if (const auto s = ini->GetSetting("uiNumActorsAllowedToMorph:FaceGen")) morphVal = s->data.u;
         }
-        LogResult("Actor Limit Fix (Morph/Lips)", morphVal >= 64, std::format("uiNumActorsAllowedToMorph:FaceGen = {}", morphVal));
+        LogResult("Lip-Sync FaceGen Morphs", morphVal >= 64, std::format("uiNumActorsAllowedToMorph:FaceGen = {}", morphVal));
 
-
-        // 10. Dynamic Havok
+        // 8. Dynamic Havok
         LogResult("Dynamic Havok Physics", cfg.dynamicHavok, "Physics timescale scaling enabled");
 
-        // 11. VSync Engine Override
+        // 9. VSync Engine Override
         int vsyncVal = -1;
         if (const auto iniPref = RE::INIPrefSettingCollection::GetSingleton()) {
             if (const auto s = iniPref->GetSetting("iVSyncPresentInterval:Display")) vsyncVal = s->data.i;

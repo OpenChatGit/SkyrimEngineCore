@@ -148,9 +148,9 @@
           }
         },
         {
-          "id": "bFixActorLimit:Engine",
-          "text": "$SkyCore_ActorLimit",
-          "help": "$SkyCore_ActorLimit_Help",
+          "id": "bFixLipSyncLimit:Engine",
+          "text": "$SkyCore_LipSyncLimit",
+          "help": "$SkyCore_LipSyncLimit_Help",
           "type": "toggle",
           "valueOptions": {
             "sourceType": "ModSettingBool"

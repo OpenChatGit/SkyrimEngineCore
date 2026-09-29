@@ -30,9 +30,8 @@ namespace SkyCore
         bool fixDistantRefLoadCrash{ false };
         bool fixGlobalTime{ true };
         bool altF4QuitFix{ true };
-        bool fixActorLimit{ true };
-        uint32_t actorMoverLimit{ 256 };
-        uint32_t actorMorphLimit{ 64 };
+        bool fixLipSyncLimit{ true };
+        uint32_t faceGenMorphLimit{ 64 };
 
         // [Diagnostics]
         bool enableCrashLogging{ true };

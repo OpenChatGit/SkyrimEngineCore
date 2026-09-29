@@ -37,9 +37,8 @@ namespace SkyCore
                     << "bFixDistantRefLoadCrash = true\n"
                     << "bFixGlobalTime = true\n"
                     << "bAltF4QuitFix = true\n"
-                    << "bFixActorLimit = true\n"
-                    << "iActorMoverLimit = 256\n"
-                    << "iActorMorphLimit = 64\n\n"
+                    << "bFixLipSyncLimit = true\n"
+                    << "iFaceGenMorphLimit = 64\n\n"
                     << "[Gameplay]\n"
                     << "bDynamicMerchantGold = true\n"
                     << "iMerchantGoldBase = 750\n"
@@ -97,10 +96,9 @@ namespace SkyCore
             else if (key == "bFixMemoryAccess") fixMemoryAccess = isTrue;
             else if (key == "bFixBSLightingAmbientSpecular") fixBSLightingAmbientSpecular = isTrue;
             else if (key == "bFixDistantRefLoadCrash") fixDistantRefLoadCrash = isTrue;
-            else if (key == "bAltF4QuitFix" || key == "altf4quitfix" || key == "df4quitfix" || key == "bdf4quitfix") altF4QuitFix = isTrue;
-            else if (key == "bFixActorLimit") fixActorLimit = isTrue;
-            else if (key == "iActorMoverLimit") { try { actorMoverLimit = static_cast<uint32_t>(std::stoul(val)); } catch (...) {} }
-            else if (key == "iActorMorphLimit") { try { actorMorphLimit = static_cast<uint32_t>(std::stoul(val)); } catch (...) {} }
+            else if (key == "bAltF4QuitFix" || key == "altf4quitfix") altF4QuitFix = isTrue;
+            else if (key == "bFixLipSyncLimit") fixLipSyncLimit = isTrue;
+            else if (key == "iFaceGenMorphLimit") { try { faceGenMorphLimit = static_cast<uint32_t>(std::stoul(val)); } catch (...) {} }
             else if (key == "bEnableCrashLogging") enableCrashLogging = isTrue;
             else if (key == "bVerboseLogging") verboseLogging = isTrue;
         }
