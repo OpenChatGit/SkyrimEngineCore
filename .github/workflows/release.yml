@@ -33,7 +33,7 @@ jobs:
           arch: x64
 
       - name: Setup Ninja
-        uses: ninja-build/setup-ninja@v1
+        run: choco install ninja --no-progress
 
       - name: Setup Python
         uses: actions/setup-python@v5

@@ -1,0 +1,24 @@
+[submodule "3rd-party/CommonLibSSE-NG"]
+	path = 3rd-party/CommonLibSSE-NG
+	url = https://github.com/CharmedBaryon/CommonLibSSE-NG.git
+[submodule "3rd-party/CrashLogger"]
+	path = 3rd-party/CrashLogger
+	url = https://github.com/alandtse/CrashLoggerSSE.git
+[submodule "3rd-party/EngineFixes"]
+	path = 3rd-party/EngineFixes
+	url = https://github.com/aers/EngineFixesSkyrim64.git
+[submodule "3rd-party/po3-Tweaks"]
+	path = 3rd-party/po3-Tweaks
+	url = https://github.com/powerof3/po3-Tweaks.git
+[submodule "3rd-party/rapidcsv"]
+	path = 3rd-party/rapidcsv
+	url = https://github.com/d99kris/rapidcsv.git
+[submodule "3rd-party/spdlog"]
+	path = 3rd-party/spdlog
+	url = https://github.com/gabime/spdlog.git
+[submodule "3rd-party/SSEDisplayTweaks"]
+	path = 3rd-party/SSEDisplayTweaks
+	url = https://github.com/SlavicPotato/SSEDisplayTweaks.git
+[submodule "3rd-party/xbyak"]
+	path = 3rd-party/xbyak
+	url = https://github.com/herumi/xbyak.git
