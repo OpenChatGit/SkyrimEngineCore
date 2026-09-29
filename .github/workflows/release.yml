@@ -70,7 +70,8 @@ jobs:
           files: dist/*.zip
           name: Skyrim Engine Core ${{ github.ref_name }}
           draft: false
-          prerelease: true
+          prerelease: false
+          make_latest: true
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

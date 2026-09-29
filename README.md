@@ -39,7 +39,7 @@
 ## ✦ Installation Guide
 
 ### Vortex Users
-1. Download `SkyrimEngineCore-v0.3.9-AE.zip` and drop it into Vortex (or click *Install with Mod Manager*).
+1. Download `SkyrimEngineCore-v0.4.0-AE.zip` and drop it into Vortex (or click *Install with Mod Manager*).
 2. The FOMOD installer will automatically select the **Core Engine Suite** and the recommended **po3_Tweaks Papyrus Script Stub**.
 3. Enable and Deploy the mod.
 4. **Vortex Dependency FAQ:** If Vortex displays a notification that another mod recommends *SSE Engine Fixes* or *powerofthree's Tweaks*, simply click **"Dismiss / Don't remind me"** (or create a rule *"Replaced by Skyrim Engine Core"*). Skyrim Engine Core satisfies these dependencies directly at the engine level.

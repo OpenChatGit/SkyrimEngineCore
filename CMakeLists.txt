@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.20)
 
 project(
     SkyCore
-    VERSION 0.3.9
+    VERSION 0.4.0
     LANGUAGES CXX
 )
 
@@ -56,6 +56,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     DbgHelp.lib
     dxgi.lib
     d3d11.lib
+    gdi32.lib
+    user32.lib
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
