@@ -1,0 +1,127 @@
+﻿diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5997b66..a127d78 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -29,8 +29,12 @@ if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
+ 	message(FATAL_ERROR "in-source builds are not allowed")
+ endif()
+ 
+-find_package(spdlog CONFIG REQUIRED)
+-find_path(RAPIDCSV_INCLUDE_DIRS "rapidcsv.h")
++if (NOT TARGET spdlog::spdlog)
++	find_package(spdlog CONFIG REQUIRED)
++endif()
++if (NOT DEFINED RAPIDCSV_INCLUDE_DIRS OR "${RAPIDCSV_INCLUDE_DIRS}" STREQUAL "")
++	find_path(RAPIDCSV_INCLUDE_DIRS "rapidcsv.h" PATHS "${CMAKE_CURRENT_SOURCE_DIR}/../rapidcsv/src")
++endif()
+ 
+ include(cmake/sourcelist.cmake)
+ include(cmake/testlist.cmake)
+@@ -120,6 +124,7 @@ target_include_directories(
+ 	PRIVATE
+ 		${spdlog_INCLUDE_DIRS}
+ 		${RAPIDCSV_INCLUDE_DIRS}
++		"${CMAKE_CURRENT_SOURCE_DIR}/../xbyak"
+ )
+ 
+ target_compile_definitions(
+@@ -131,6 +136,7 @@ target_link_libraries(
+ 	"${PROJECT_NAME}"
+ 	PUBLIC
+ 		spdlog::spdlog
++		xbyak::xbyak
+  		Advapi32.lib
+ 		D3D11.lib
+ 		d3dcompiler.lib
+@@ -146,6 +152,7 @@ target_precompile_headers(
+ 		include/SKSE/Impl/PCH.h
+ )
+ 
++if(PROJECT_IS_TOP_LEVEL)
+ install(
+ 	TARGETS "${PROJECT_NAME}"
+ 	EXPORT "${PROJECT_NAME}-targets"
+@@ -176,6 +183,7 @@ install(
+ 		"include/SKSE"
+ 	DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+ )
++endif()
+ 
+ if(BUILD_TESTS)
+ 	find_package(Catch2 CONFIG REQUIRED)
+diff --git a/include/REL/ID.h b/include/REL/ID.h
+index 8d7f2be..bb0cf16 100644
+--- a/include/REL/ID.h
++++ b/include/REL/ID.h
+@@ -253,6 +253,27 @@ namespace REL
+             {
+                 std::int32_t format{};
+                 a_in.readin(format);
++                _format = format;
++
++                if (format == 5) {
++                    std::int32_t version[4]{};
++                    a_in.readin(version);
++                    a_in.ignore(64); // 64-byte module name buffer
++
++                    std::uint64_t pointerSize{};
++                    a_in.readin(pointerSize);
++                    std::uint64_t addrCount{};
++                    a_in.readin(addrCount);
++
++                    _pointerSize = pointerSize;
++                    _addressCount = addrCount;
++
++                    for (std::size_t i = 0; i < std::extent_v<decltype(version)>; ++i) {
++                        _version[i] = static_cast<std::uint16_t>(version[i]);
++                    }
++                    return;
++                }
++
+                 if (format != a_formatVersion) {
+                     stl::report_and_fail(
+                             std::format(
+@@ -270,7 +291,9 @@ namespace REL
+                 a_in.ignore(nameLen);
+ 
+                 a_in.readin(_pointerSize);
+-                a_in.readin(_addressCount);
++                std::int32_t legacyCount{};
++                a_in.readin(legacyCount);
++                _addressCount = static_cast<std::uint64_t>(legacyCount);
+ 
+                 for (std::size_t i = 0; i < std::extent_v<decltype(version)>; ++i) {
+                     _version[i] = static_cast<std::uint16_t>(version[i]);
+@@ -283,10 +306,13 @@ namespace REL
+ 
+             [[nodiscard]] Version version() const noexcept { return _version; }
+ 
++            [[nodiscard]] std::int32_t format() const noexcept { return _format; }
++
+         private:
+-            Version      _version;
+-            std::int32_t _pointerSize{0};
+-            std::int32_t _addressCount{0};
++            Version       _version;
++            std::int32_t  _pointerSize{0};
++            std::uint64_t _addressCount{0};
++            std::int32_t  _format{0};
+         };
+ 
+         IDDatabase() = default;
+@@ -330,6 +356,15 @@ namespace REL
+ 
+         bool unpack_file(istream_t &a_in, header_t a_header, bool a_failOnError)
+         {
++            if (a_header.format() == 5) {
++                std::uint32_t offset = 0;
++                for (std::size_t i = 0; i < a_header.address_count(); ++i) {
++                    a_in.readin(offset);
++                    _id2offset[i] = { static_cast<std::uint64_t>(i), static_cast<std::uint64_t>(offset) };
++                }
++                return true;
++            }
++
+             std::uint8_t type = 0;
+             std::uint64_t id = 0;
+             std::uint64_t offset = 0;

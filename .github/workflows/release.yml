@@ -27,6 +27,10 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
+      - name: Apply patches
+        run: |
+          git -C 3rd-party/CommonLibSSE-NG apply ../../patches/CommonLibSSE-NG.patch
+
       - name: Setup MSVC Developer Command Prompt
         uses: ilammy/msvc-dev-cmd@v1
         with:
