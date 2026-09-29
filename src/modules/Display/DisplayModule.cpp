@@ -312,12 +312,45 @@ namespace SkyCore::Modules::Display
         return CallWindowProcA(s_originalWndProc, hWnd, uMsg, wParam, lParam);
     }
 
-    static void InstallWndProcHook()
+    static void ApplyNativeBorderlessFullscreen(HWND a_hwnd)
     {
-        if (!Config::Get().altF4QuitFix) {
+        if (!a_hwnd || !IsWindow(a_hwnd)) {
             return;
         }
 
+        const auto& cfg = Config::Get();
+        if (!cfg.borderlessFullscreen) {
+            return;
+        }
+
+        // Get target monitor geometry
+        HMONITOR hMon = MonitorFromWindow(a_hwnd, MONITOR_DEFAULTTOPRIMARY);
+        MONITORINFO mi = { sizeof(mi) };
+        if (GetMonitorInfoA(hMon, &mi)) {
+            const int width = mi.rcMonitor.right - mi.rcMonitor.left;
+            const int height = mi.rcMonitor.bottom - mi.rcMonitor.top;
+
+            // Strip window borders, caption, and resizing frame
+            LONG_PTR style = GetWindowLongPtrA(a_hwnd, GWL_STYLE);
+            style &= ~(WS_CAPTION | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
+            style |= WS_POPUP | WS_VISIBLE;
+            SetWindowLongPtrA(a_hwnd, GWL_STYLE, style);
+
+            LONG_PTR exStyle = GetWindowLongPtrA(a_hwnd, GWL_EXSTYLE);
+            exStyle &= ~(WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE | WS_EX_WINDOWEDGE);
+            SetWindowLongPtrA(a_hwnd, GWL_EXSTYLE, exStyle);
+
+            // Resize and reposition seamlessly to monitor bounds
+            SetWindowPos(a_hwnd, HWND_NOTOPMOST, mi.rcMonitor.left, mi.rcMonitor.top, width, height,
+                SWP_FRAMECHANGED | SWP_NOACTIVATE | SWP_SHOWWINDOW);
+
+            logger::info("DisplayModule: Applied native borderless fullscreen ({}x{} at {},{}) to HWND {:p}",
+                width, height, mi.rcMonitor.left, mi.rcMonitor.top, (void*)a_hwnd);
+        }
+    }
+
+    static void InstallWndProcHook()
+    {
         HWND targetHwnd = nullptr;
 
         struct EnumData {
@@ -348,16 +381,21 @@ namespace SkyCore::Modules::Display
         targetHwnd = data.hwnd;
 
         if (targetHwnd && IsWindow(targetHwnd)) {
-            s_originalWndProc = reinterpret_cast<WNDPROC>(
-                SetWindowLongPtrA(targetHwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(SkyCoreWndProc))
-            );
-            if (s_originalWndProc) {
-                logger::info("DisplayModule: Successfully subclassed Skyrim window HWND {:p} for Alt+F4 quit fix", (void*)targetHwnd);
-            } else {
-                logger::warn("DisplayModule: SetWindowLongPtrA failed on HWND {:p} (error={})", (void*)targetHwnd, GetLastError());
+            // Apply native borderless fullscreen window positioning
+            ApplyNativeBorderlessFullscreen(targetHwnd);
+
+            if (Config::Get().altF4QuitFix) {
+                s_originalWndProc = reinterpret_cast<WNDPROC>(
+                    SetWindowLongPtrA(targetHwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(SkyCoreWndProc))
+                );
+                if (s_originalWndProc) {
+                    logger::info("DisplayModule: Successfully subclassed Skyrim window HWND {:p} for Alt+F4 quit fix", (void*)targetHwnd);
+                } else {
+                    logger::warn("DisplayModule: SetWindowLongPtrA failed on HWND {:p} (error={})", (void*)targetHwnd, GetLastError());
+                }
             }
         } else {
-            logger::warn("DisplayModule: Could not locate Skyrim main window HWND for Alt+F4 quit fix");
+            logger::warn("DisplayModule: Could not locate Skyrim main window HWND");
         }
     }
 
@@ -491,11 +529,22 @@ namespace SkyCore::Modules::Display
             }
         }
 
-        // 2. Force iVSyncPresentInterval based on SkyCore configuration (overrides SkyrimPrefs.ini in engine memory)
+        // 2. Force iVSyncPresentInterval and Borderless in engine memory preferences
         if (const auto iniPref = RE::INIPrefSettingCollection::GetSingleton()) {
             if (const auto setting = iniPref->GetSetting("iVSyncPresentInterval:Display")) {
                 setting->data.i = cfg.disableVSync ? 0 : 1;
-                logger::info("DisplayModule: iVSyncPresentInterval in engine memory set to {} (base game VSync overridden)", setting->data.i);
+                logger::info("DisplayModule: iVSyncPresentInterval in engine memory set to {} (VSync {})",
+                    setting->data.i, cfg.disableVSync ? "DISABLED" : "ENABLED");
+            }
+            if (cfg.borderlessFullscreen) {
+                if (const auto setting = iniPref->GetSetting("bFull Screen:Display")) {
+                    setting->data.b = false;
+                    logger::info("DisplayModule: bFull Screen forced to false (Borderless enabled)");
+                }
+                if (const auto setting = iniPref->GetSetting("bBorderless:Display")) {
+                    setting->data.b = true;
+                    logger::info("DisplayModule: bBorderless forced to true (Borderless enabled)");
+                }
             }
         }
     }

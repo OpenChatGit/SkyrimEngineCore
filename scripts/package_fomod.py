@@ -83,7 +83,7 @@ SkyCore.dll natively handles all tweak queries at the engine level.</description
 bBorderlessFullscreen = true      # Eliminates DXGI occlusion black screens on dual-GPU / laptops
 bDynamicHavok = true              # Smooth high-refresh physics scaling (prevents Havok glitching >60 FPS)
 iTargetFPS = 0                    # Framerate limit (0 = display native / unlimited)
-bDisableVSync = false             # Set true to unlock tearing-free high FPS
+bDisableVSync = true              # Set true to unlock tearing-free high FPS
 
 [Engine]
 bSafeExit = true                  # Instant, clean game shutdown without freezing
