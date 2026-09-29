@@ -1,0 +1,184 @@
+{
+  "modName": "SkyCore",
+  "displayName": "SkyCore",
+  "minMcmVersion": 9,
+  "cursorFillMode": "topToBottom",
+  "pages": [
+    {
+      "pageDisplayName": "Display & FPS",
+      "cursorFillMode": "topToBottom",
+      "content": [
+        {
+          "text": "FPS Counter Settings",
+          "type": "header"
+        },
+        {
+          "id": "bShowFPS:Display",
+          "text": "Show FPS Counter",
+          "help": "Toggle the small FPS display in the top-left corner on or off.",
+          "type": "toggle",
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "id": "iToggleKey:Display",
+          "text": "Toggle FPS Hotkey",
+          "help": "Press any key to assign the hotkey for showing/hiding the FPS counter. Default is Insert (210).",
+          "type": "keymap",
+          "ignoreConflicts": true,
+          "valueOptions": {
+            "sourceType": "ModSettingInt"
+          }
+        },
+        {
+          "text": "Display Engine & Refresh Rate",
+          "type": "header"
+        },
+        {
+          "id": "bDynamicHavok:Display",
+          "text": "Dynamic Havok Physics",
+          "help": "Dynamically scales physics time step to eliminate physics glitches over 60 FPS.",
+          "type": "toggle",
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "id": "bBorderlessFullscreen:Display",
+          "text": "Borderless Fullscreen",
+          "help": "Eliminates DXGI occlusion black screens and enables seamless Alt-Tab.",
+          "type": "toggle",
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "id": "bDisableVSync:Display",
+          "text": "Disable V-Sync",
+          "help": "Disables V-Sync to achieve maximum framerate without input latency. Completely overrides SkyrimPrefs.ini.",
+          "type": "toggle",
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "id": "iTargetFPS:Display",
+          "text": "Target Framerate Limit",
+          "help": "Sets the engine framerate cap. Set to 0 for unlimited / native display refresh rate. Completely overrides Skyrim's built-in 60 FPS lock.",
+          "type": "slider",
+          "valueOptions": {
+            "sourceType": "ModSettingInt",
+            "min": 0,
+            "max": 360,
+            "step": 5
+          }
+        }
+      ]
+    },
+    {
+      "pageDisplayName": "Engine & Stability",
+      "cursorFillMode": "topToBottom",
+      "content": [
+        {
+          "text": "Engine Core Fixes",
+          "type": "header"
+        },
+        {
+          "id": "bMaxStdIO:Engine",
+          "text": "MaxStdIO (8192 File Handles)",
+          "help": "Increases stdio file handle limit from 512 to 8192 to prevent missing mesh/texture CTDs with large load orders.",
+          "type": "toggle",
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "id": "bSafeExit:Engine",
+          "text": "Safe Exit",
+          "help": "Prevents the game from hanging or freezing on desktop exit.",
+          "type": "toggle",
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "id": "bCleanSKSECoSaves:Engine",
+          "text": "Clean Orphaned Co-Saves",
+          "help": "Automatically cleans up orphaned .skse co-save files without matching .ess saves.",
+          "type": "toggle",
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "id": "bFixCellInit:Engine",
+          "text": "Cell Init Crash Fix",
+          "help": "Resolves uninitialized location form IDs to pointers when loading cells (prevents rare cell transition CTDs).",
+          "type": "toggle",
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "id": "bFixEffectShaderZBuffer:Engine",
+          "text": "Effect Shader Z-Buffer Fix",
+          "help": "Disables Z-write on particle shaders to prevent depth buffer fighting and visual artifacts.",
+          "type": "toggle",
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "id": "bFixBSTempEffectNiRTTI:Engine",
+          "text": "BSTempEffect NiRTTI Fix",
+          "help": "Corrects base NiRTTI linkage on temporary effects to prevent invalid cast CTDs.",
+          "type": "toggle",
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "id": "bAltF4QuitFix:Engine",
+          "text": "Alt+F4 Quick Quit (Quit Fix)",
+          "help": "Allows cleanly closing the Skyrim process immediately by pressing Alt + F4 at any time.",
+          "type": "toggle",
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "id": "bFixActorLimit:Engine",
+          "text": "Actor Limit Fix (256 Movers / 64 Morphs)",
+          "help": "Prevents NPCs from sliding/floating in crowds (limit 256) and prevents frozen dialogue lips (morph limit 64).",
+          "type": "toggle",
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "id": "bDynamicMerchantGold:Gameplay",
+          "text": "Dynamic Merchant Gold (Level & Speech Scaling)",
+          "help": "Dynamically scales merchant gold with player level and Speechcraft, preventing the 32k barter overflow bug.",
+          "type": "toggle",
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "text": "Crash Diagnostics",
+          "type": "header"
+        },
+        {
+          "id": "bEnableCrashLogging:Diagnostics",
+          "text": "Active VEH Crash Diagnostics",
+          "help": "Logs stack backtraces and x64 CPU register dumps to Documents/My Games/Skyrim Special Edition/SKSE/SkyCore_Crash.log.",
+          "type": "toggle",
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        }
+      ]
+    }
+  ]
+}

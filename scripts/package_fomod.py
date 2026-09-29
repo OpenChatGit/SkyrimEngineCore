@@ -101,18 +101,22 @@ bVerboseLogging = false           # Detailed debug logs in Documents\\My Games\\
             print(f"[!] Warning: Built DLL not found at {src_dll}")
 
     # Copy SkyCore.esp
-    game_esp = os.path.join(SKYCORE_ROOT, "..", "Data", "SkyCore.esp")
-    if os.path.exists(game_esp):
-        shutil.copy2(game_esp, os.path.join(STAGE_DIR, "SkyCore.esp"))
+    esp_src = os.path.join(SKYCORE_ROOT, "assets", "SkyCore.esp")
+    if not os.path.exists(esp_src):
+        esp_src = os.path.join(SKYCORE_ROOT, "..", "Data", "SkyCore.esp")
+    if os.path.exists(esp_src):
+        shutil.copy2(esp_src, os.path.join(STAGE_DIR, "SkyCore.esp"))
         print("[+] Successfully bundled SkyCore.esp")
 
     # Copy Papyrus scripts for full po3_Tweaks and SkyCore MCM compatibility
     stage_scripts = os.path.join(STAGE_DIR, "scripts")
     os.makedirs(stage_scripts, exist_ok=True)
     for pex_name in ["po3_Tweaks.pex", "SkyCore_MCM.pex"]:
-        game_pex = os.path.join(SKYCORE_ROOT, "..", "Data", "scripts", pex_name)
-        if os.path.exists(game_pex):
-            shutil.copy2(game_pex, os.path.join(stage_scripts, pex_name))
+        pex_src = os.path.join(SKYCORE_ROOT, "assets", "scripts", pex_name)
+        if not os.path.exists(pex_src):
+            pex_src = os.path.join(SKYCORE_ROOT, "..", "Data", "scripts", pex_name)
+        if os.path.exists(pex_src):
+            shutil.copy2(pex_src, os.path.join(stage_scripts, pex_name))
             print(f"[+] Successfully bundled scripts/{pex_name}")
 
     # Copy MCM Helper config and settings
@@ -121,15 +125,17 @@ bVerboseLogging = false           # Detailed debug logs in Documents\\My Games\\
     os.makedirs(mcm_config_dir, exist_ok=True)
     os.makedirs(mcm_settings_dir, exist_ok=True)
     
-    src_config = os.path.join(SKYCORE_ROOT, "..", "Data", "MCM", "Config", "SkyCore", "config.json")
-    src_def_settings = os.path.join(SKYCORE_ROOT, "..", "Data", "MCM", "Config", "SkyCore", "settings.ini")
-    src_settings = os.path.join(SKYCORE_ROOT, "..", "Data", "MCM", "Settings", "SkyCore.ini")
-    if os.path.exists(src_config):
-        shutil.copy2(src_config, os.path.join(mcm_config_dir, "config.json"))
-        print("[+] Successfully bundled MCM/Config/SkyCore/config.json")
-    if os.path.exists(src_def_settings):
-        shutil.copy2(src_def_settings, os.path.join(mcm_config_dir, "settings.ini"))
-        print("[+] Successfully bundled MCM/Config/SkyCore/settings.ini")
+    for filename in ["config.json", "settings.ini"]:
+        src = os.path.join(SKYCORE_ROOT, "assets", "MCM", "Config", "SkyCore", filename)
+        if not os.path.exists(src):
+            src = os.path.join(SKYCORE_ROOT, "..", "Data", "MCM", "Config", "SkyCore", filename)
+        if os.path.exists(src):
+            shutil.copy2(src, os.path.join(mcm_config_dir, filename))
+            print(f"[+] Successfully bundled MCM/Config/SkyCore/{filename}")
+
+    src_settings = os.path.join(SKYCORE_ROOT, "assets", "MCM", "Settings", "SkyCore.ini")
+    if not os.path.exists(src_settings):
+        src_settings = os.path.join(SKYCORE_ROOT, "..", "Data", "MCM", "Settings", "SkyCore.ini")
     if os.path.exists(src_settings):
         shutil.copy2(src_settings, os.path.join(mcm_settings_dir, "SkyCore.ini"))
         print("[+] Successfully bundled MCM/Settings/SkyCore.ini")
