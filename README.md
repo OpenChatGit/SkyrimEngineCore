@@ -6,20 +6,20 @@
 
 ## ✦ Features
 
-- **MaxStdIO Fix:** Increases maximum open file handles from vanilla 512 to **8,192** (prevents missing-mesh and texture loading crashes in heavy modlists).
-- **SafeExit & Alt+F4 Quick Exit:** Prevents hang-on-exit crashes and allows closing Skyrim immediately with Alt+F4 (`df4quitfix`).
-- **Clean Co-Saves:** Automatically purges orphaned `.skse` co-saves without matching `.ess` save files.
-- **Actor Limit Fix:** Expands actor movement cap to 256 and facial morph/lip-sync cap to 64 simultaneous actors.
-- **Dynamic Havok Physics:** High-refresh physics timescale scaling (>60 FPS / 144Hz / 240Hz) preventing Havok glitching.
-- **Engine Patches:** Temporary effect NiRTTI inheritance fix and particle shader Z-buffer depth fix.
-- **Built-in Diagnostics:** Startup self-test suite and lightweight exception handler with register and module crash logging.
-- **In-Game FPS & OSD:** Native DirectX 11 / ImGui overlay with hotkey toggling and SkyUI MCM configuration.
+- **File Handle Expansion (8,192 MaxStdIO):** Eliminates missing-mesh and texture loading crashes in heavy modlists by multiplying available file descriptors.
+- **SafeExit & Quick Termination:** Prevents freeze-on-exit and allows closing Skyrim immediately with Alt+F4.
+- **Automated Co-Save Purge:** Automatically detects and purges orphaned `.skse` co-saves without matching `.ess` save files.
+- **Actor Movement & Lip-Sync Scaler:** Expands active moving actor cap to 256 and simultaneous facial morph / lip-sync cap to 64 actors.
+- **High-Refresh Dynamic Havok Physics:** High-framerate physics timescale scaling (>60 FPS / 144Hz / 240Hz) preventing physics glitching and camera stutter.
+- **Engine Integrity Patches:** Fixes temporary effect NiRTTI inheritance memory crashes and particle shader depth writing.
+- **Native Diagnostics & Self-Test:** Automatic startup self-test report in `SkyCore.log` and lightweight VEH crash handler with register and module dump.
+- **In-Game Hardware Monitor & OSD:** Native DirectX 11 / ImGui overlay with hotkey toggling and SkyUI MCM configuration.
 
 ---
 
 ## ✦ Requirements
 
-- [SKSE64](https://skse.silverlock.org/)
+- [SKSE64](https://skse.silverlock.org/) (matching your game version)
 - [Address Library for SKSE Plugins](https://www.nexusmods.com/skyrimspecialedition/mods/32444)
 
 ---
@@ -33,14 +33,16 @@ cmake --build build --config Release
 
 ---
 
-## ✦ License & Credits
+## ✦ License & Legal Compliance
 
 This project is licensed under the **GNU General Public License v3.0 (GPLv3)**.
 
-Special thanks and acknowledgement to the original creators whose research and open-source foundations made this unified project possible:
-- **SSE Engine Fixes** – aers, Nukem, Ryan (fudgyduff)
-- **SSE Display Tweaks** – SlavicPotato
-- **powerofthree's Tweaks** – powerofthree
-- **Actor Limit Fix** – KernalsEgg
-- **df4quitfix** – D7ry
-- **SKSE & CommonLibSSE-NG** – ianpatt, behippo, scripthoge, CharmedBaryon
+All research, open-source logic, and memory reverse-engineering utilized in this project operate strictly within the legal scope of the **GNU General Public License v3.0** and the **MIT License**. The rights granted by the original copyright holders under these licenses are legally binding and cannot be diminished or superseded by third parties.
+
+Acknowledgements to the open-source reverse-engineering community:
+- aers, Nukem, Ryan (fudgyduff)
+- SlavicPotato
+- powerofthree
+- KernalsEgg
+- D7ry
+- ianpatt, behippo, scripthoge, CharmedBaryon

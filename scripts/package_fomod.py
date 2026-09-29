@@ -23,8 +23,8 @@ def create_fomod_package():
   <Name>Skyrim Engine Core (SEC) - Unified Engine, Display &amp; Tweaks Suite</Name>
   <Author>Nicol</Author>
   <Version>0.3.6</Version>
-  <Description>Unified, high-performance master engine suite for Skyrim AE 1.7.104+. Replaces Engine Fixes, Display Tweaks, po3 Tweaks, and Crash Logger with a single, perfectly optimized, non-experimental native DLL.</Description>
-  <Website>https://github.com/</Website>
+  <Description>Unified, high-performance master engine suite for Skyrim AE 1.7.104+. Provides high-refresh Havok physics, MaxStdIO file handle expansion (8192), 64 face morph lip-sync scaling, instant Alt+F4 termination, and integrated diagnostics.</Description>
+  <Website>https://github.com/OpenChatGit/SkyrimEngineCore</Website>
 </fomod>"""
 
     module_config_xml = """<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://qconsulting.ca/fo3/ModConfig5.0.xsd">
@@ -86,10 +86,10 @@ bVerboseLogging = false           # Detailed debug logs in Documents\\My Games\\
     with open(os.path.join(PLUGINS_DIR, "SkyCore.toml"), "w", encoding="utf-8") as f:
         f.write(default_toml)
 
-    # Copy built DLLs (SkyCore + compatibility shims)
+    # Copy built native DLL
     build_dir = os.path.join(SKYCORE_ROOT, "build")
     game_plugins_dir = os.path.join(SKYCORE_ROOT, "..", "Data", "SKSE", "Plugins")
-    for dll_name in ["SkyCore.dll", "po3_Tweaks.dll", "EngineFixes.dll"]:
+    for dll_name in ["SkyCore.dll"]:
         src_dll = os.path.join(build_dir, dll_name)
         if not os.path.exists(src_dll):
             src_dll = os.path.join(game_plugins_dir, dll_name)
@@ -108,10 +108,10 @@ bVerboseLogging = false           # Detailed debug logs in Documents\\My Games\\
         shutil.copy2(esp_src, os.path.join(STAGE_DIR, "SkyCore.esp"))
         print("[+] Successfully bundled SkyCore.esp")
 
-    # Copy Papyrus scripts for full po3_Tweaks and SkyCore MCM compatibility
+    # Copy Papyrus scripts
     stage_scripts = os.path.join(STAGE_DIR, "scripts")
     os.makedirs(stage_scripts, exist_ok=True)
-    for pex_name in ["po3_Tweaks.pex", "SkyCore_MCM.pex"]:
+    for pex_name in ["SkyCore_MCM.pex"]:
         pex_src = os.path.join(SKYCORE_ROOT, "assets", "scripts", pex_name)
         if not os.path.exists(pex_src):
             pex_src = os.path.join(SKYCORE_ROOT, "..", "Data", "scripts", pex_name)

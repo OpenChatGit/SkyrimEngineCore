@@ -62,14 +62,3 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     OUTPUT_NAME "SkyCore"
     SUFFIX ".dll"
 )
-
-# Compatibility Shims for Vortex & SKSE dependent mods (Precision, TDM, etc.)
-add_library(po3_Tweaks SHARED "${SKYCORE_ROOT}/src/shims/po3_Tweaks_shim.cpp")
-target_compile_definitions(po3_Tweaks PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX SKYRIM_AE)
-target_link_libraries(po3_Tweaks PRIVATE CommonLibSSE::CommonLibSSE)
-set_target_properties(po3_Tweaks PROPERTIES OUTPUT_NAME "po3_Tweaks" SUFFIX ".dll")
-
-add_library(EngineFixes SHARED "${SKYCORE_ROOT}/src/shims/EngineFixes_shim.cpp")
-target_compile_definitions(EngineFixes PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX SKYRIM_AE)
-target_link_libraries(EngineFixes PRIVATE CommonLibSSE::CommonLibSSE)
-set_target_properties(EngineFixes PROPERTIES OUTPUT_NAME "EngineFixes" SUFFIX ".dll")
