@@ -52,13 +52,12 @@ def create_fomod_package():
               <description>Installs the compiled Papyrus interface script (po3_Tweaks.pex).
 Select this if you use mods that query po3_Tweaks via Papyrus (e.g. True Directional Movement, Precision).
 SkyCore.dll natively handles all tweak queries at the engine level.</description>
-              <image path=""/>
-              <typeHandling>
-                <defaultType name="Recommended"/>
-              </typeHandling>
               <files>
                 <folder source="01_Compatibility_po3_Tweaks" destination="" priority="1"/>
               </files>
+              <typeDescriptor>
+                <type name="Recommended"/>
+              </typeDescriptor>
             </plugin>
           </plugins>
         </group>
