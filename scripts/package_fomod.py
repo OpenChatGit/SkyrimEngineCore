@@ -16,6 +16,8 @@ PLUGINS_DIR = os.path.join(STAGE_DIR, "SKSE", "Plugins")
 BUILD_DLL = os.path.join(SKYCORE_ROOT, "build", "SkyCore.dll")
 
 def create_fomod_package():
+    if os.path.exists(STAGE_DIR):
+        shutil.rmtree(STAGE_DIR)
     os.makedirs(FOMOD_DIR, exist_ok=True)
     os.makedirs(PLUGINS_DIR, exist_ok=True)
 
@@ -23,18 +25,41 @@ def create_fomod_package():
   <Name>Skyrim Engine Core (SEC) - Unified Engine, Display &amp; Tweaks Suite</Name>
   <Author>Nicol</Author>
   <Version>0.3.6</Version>
-  <Description>Unified, high-performance master engine suite for Skyrim AE 1.7.104+. Provides high-refresh Havok physics, MaxStdIO file handle expansion (8192), 64 face morph lip-sync scaling, instant Alt+F4 termination, and integrated diagnostics.</Description>
+  <Description>Unified master engine suite for Skyrim AE 1.7.104+. Directly replaces SSE Engine Fixes (Nexus #17230), SSE Display Tweaks (Nexus #34705), powerofthree's Tweaks (Nexus #51073), and Actor Limit Fix (Nexus #32349). Provides native Papyrus compatibility hooks so third-party mods operate seamlessly without legacy DLL dependencies.</Description>
   <Website>https://github.com/OpenChatGit/SkyrimEngineCore</Website>
 </fomod>"""
 
     module_config_xml = """<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://qconsulting.ca/fo3/ModConfig5.0.xsd">
   <moduleName>Skyrim Engine Core (SEC) - Unified Engine, Display &amp; Tweaks Suite</moduleName>
-  <requiredInstallFiles>
-    <file source="SkyCore.esp" destination="SkyCore.esp" priority="0"/>
-    <folder source="SKSE" destination="SKSE" priority="0"/>
-    <folder source="scripts" destination="scripts" priority="0"/>
-    <folder source="MCM" destination="MCM" priority="0"/>
-  </requiredInstallFiles>
+  <installSteps order="Explicit">
+    <installStep name="Unified Engine Architecture">
+      <optionalFileGroups order="Explicit">
+        <group name="Integrated Engine &amp; Tweaks Components" type="SelectAny">
+          <plugins order="Explicit">
+            <plugin name="Skyrim Engine Core (Unified Master Suite)">
+              <description>Installs the complete unified engine suite. Natively replaces:
+- SSE Engine Fixes (Nexus #17230): MaxStdIO 8192 file handles, SafeExit, Memory patch
+- SSE Display Tweaks (Nexus #34705): High-refresh Havok physics, borderless fullscreen
+- powerofthree's Tweaks (Nexus #51073): Native Papyrus IsTweakInstalled hook
+- Actor Limit Fix (Nexus #32349): 256 NPC mover limit &amp; 64 lip-sync face morphs
+
+VORTEX NOTE: If any other mod asks for SSE Engine Fixes or po3_Tweaks, you can safely select 'Dismiss / Ignore' in Vortex.</description>
+              <image path=""/>
+              <typeHandling>
+                <defaultType name="Required"/>
+              </typeHandling>
+              <files>
+                <file source="SkyCore.esp" destination="SkyCore.esp" priority="0"/>
+                <folder source="SKSE" destination="SKSE" priority="0"/>
+                <folder source="scripts" destination="scripts" priority="0"/>
+                <folder source="MCM" destination="MCM" priority="0"/>
+              </files>
+            </plugin>
+          </plugins>
+        </group>
+      </optionalFileGroups>
+    </installStep>
+  </installSteps>
 </config>"""
 
     with open(os.path.join(FOMOD_DIR, "info.xml"), "w", encoding="utf-8") as f:

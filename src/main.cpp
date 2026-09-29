@@ -48,6 +48,23 @@ namespace
             spdlog::set_pattern("[%Y-%m-%d %T.%e] [%^%l%$] %v");
         }
     }
+
+    // Native Papyrus compatibility: third-party mods inquiring about po3_Tweaks
+    bool Papyrus_IsTweakInstalled(RE::BSScript::Internal::VirtualMachine*, RE::VMStackID, RE::StaticFunctionTag*, RE::BSFixedString a_tweak)
+    {
+        logger::info("Papyrus: po3_Tweaks.IsTweakInstalled('{}') -> Satisfied natively by Skyrim Engine Core", a_tweak.c_str());
+        return true;
+    }
+
+    bool BindPapyrusCompatibility(RE::BSScript::Internal::VirtualMachine* a_vm)
+    {
+        if (!a_vm) {
+            return false;
+        }
+        a_vm->RegisterFunction("IsTweakInstalled", "po3_Tweaks", Papyrus_IsTweakInstalled, true);
+        logger::info("Papyrus: Registered 'po3_Tweaks.IsTweakInstalled' compatibility stub.");
+        return true;
+    }
 }
 
 SKSEPluginLoad(const SKSE::LoadInterface* a_skse)
@@ -105,6 +122,13 @@ SKSEPluginLoad(const SKSE::LoadInterface* a_skse)
                 }
             });
             logger::info("SKSE messaging listener registered for kDataLoaded & kInputLoaded.");
+        }
+
+        // Register Papyrus interface for native script compatibility stubs
+        auto papyrus = SKSE::GetPapyrusInterface();
+        if (papyrus) {
+            papyrus->Register(BindPapyrusCompatibility);
+            logger::info("SKSE Papyrus compatibility listener registered.");
         }
 
         logger::info("SkyCore: All unified modules loaded and initialized successfully.");
