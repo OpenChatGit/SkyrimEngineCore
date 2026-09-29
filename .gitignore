@@ -1,0 +1,39 @@
+# Build outputs & caches
+build/
+bin/
+out/
+CMakeFiles/
+CMakeCache.txt
+*.ninja*
+*.cmake
+!CMakeLists.txt
+
+# Artifact releases
+dist/
+
+# Visual Studio / IDE
+.vs/
+*.user
+*.suo
+*.sln.docstates
+
+# Intermediate compiler and linker artifacts
+*.obj
+*.pdb
+*.ilk
+*.exp
+*.lib
+*.idb
+
+# Vcpkg package manager cache
+vcpkg/
+vcpkg_installed/
+
+# Logs and dumps
+*.log
+*.dmp
+
+# OS files
+Thumbs.db
+.DS_Store
+desktop.ini
