@@ -35,7 +35,8 @@ def create_fomod_package():
   <Author>Nicol</Author>
   <Version>{VERSION}</Version>
   <Description>Unified master engine suite for Skyrim AE 1.7.104+. Directly replaces SSE Engine Fixes (Nexus #17230), SSE Display Tweaks (Nexus #34705), powerofthree's Tweaks (Nexus #51073), and Actor Limit Fix (Nexus #32349). Native Papyrus compatibility hooks and optional script stubs ensure seamless compatibility with dependent mods.</Description>
-  <Website>https://github.com/OpenChatGit/SkyrimEngineCore</Website>
+  <Website>https://github.com/OpenChatGit/SkyrimEngineCore/releases</Website>
+  <Id>SkyrimEngineCore</Id>
 </fomod>"""
 
     module_config_xml = f"""<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://qconsulting.ca/fo3/ModConfig5.0.xsd">
