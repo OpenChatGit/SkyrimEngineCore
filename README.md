@@ -17,19 +17,46 @@
 
 ---
 
-## ✦ Requirements
+## ✦ Feature Comparison Matrix
 
-- [SKSE64](https://skse.silverlock.org/) (matching your game version)
-- [Address Library for SKSE Plugins](https://www.nexusmods.com/skyrimspecialedition/mods/32444)
+| Feature / Fix | Legacy SSE Engine Fixes | Legacy SSE Display Tweaks | Legacy po3_Tweaks | **Skyrim Engine Core (SEC)** |
+| :--- | :---: | :---: | :---: | :---: |
+| **MaxStdIO File Descriptors (8192)** |  (Part 1 + 2) | ❌ | ❌ | ** Native C++ (Single DLL)** |
+| **SafeExit (Instant Desktop Exit)** |  | ❌ | ❌ | ** Integrated** |
+| **Dynamic Havok High-FPS Physics** | ❌ |  | ❌ | ** Integrated** |
+| **Borderless Fullscreen DXGI Fix** | ❌ |  | ❌ | ** Integrated** |
+| **V-Sync Override & Frame Limiter** | ❌ |  | ❌ | ** Integrated** |
+| **Actor Limit (256 Movers / 64 Morphs)** | ❌ | ❌ | ❌ | ** Integrated** |
+| **Dynamic Merchant Gold Scaling** | ❌ | ❌ | ❌ | ** Integrated** |
+| **Clean SKSE Co-Saves** |  | ❌ | ❌ | ** Integrated** |
+| **po3_Tweaks Papyrus Hook (`IsTweakInstalled`)**| ❌ | ❌ |  | ** Native C++ Emulation** |
+| **MCM Helper In-Game Config** | ❌ | ❌ | ❌ | ** (EN / DE localized)** |
+| **VEH Lightweight Crash Logger** | ❌ | ❌ | ❌ | ** Integrated** |
+| **Skyrim AE 1.7.104+ Compatibility** | ⚠️ Partial | ⚠️ Partial | ⚠️ Partial | ** 100% Native & Tested** |
 
 ---
 
-## ✦ Building from Source
+## ✦ Installation Guide
 
-```powershell
-cmake -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release
-cmake --build build --config Release
-```
+### Vortex Users
+1. Download `SkyrimEngineCore-v0.3.7-AE.zip` and drop it into Vortex (or click *Install with Mod Manager*).
+2. The FOMOD installer will automatically select the **Core Engine Suite** and the recommended **po3_Tweaks Papyrus Script Stub**.
+3. Enable and Deploy the mod.
+4. **Vortex Dependency FAQ:** If Vortex displays a notification that another mod recommends *SSE Engine Fixes* or *powerofthree's Tweaks*, simply click **"Dismiss / Don't remind me"** (or create a rule *"Replaced by Skyrim Engine Core"*). Skyrim Engine Core satisfies these dependencies directly at the engine level.
+
+### Mod Organizer 2 (MO2) Users
+1. Install the archive via the *Install Mod* icon or drag-and-drop.
+2. Confirm the FOMOD options in the installer dialog.
+3. Check the box to activate the mod in your left pane load order.
+
+---
+
+## ✦ Configuration & In-Game MCM
+
+Skyrim Engine Core comes pre-configured with safe, optimal defaults:
+- Configuration file: `Data/SKSE/Plugins/SkyCore.toml`
+- In-Game MCM: In the pause menu under **Mod Configuration > SkyCore**, you can toggle features, adjust FPS limits, and assign hotkeys in real-time.
+- Supports **English** and **German** interface translations out of the box.
 
 ---
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 SkyCore FOMOD Packaging Script
-Creates a Vortex-compatible 1-click installer archive and stages the mod files.
+Creates a Vortex/MO2-compatible modular installer archive with optional compatibility stubs.
 """
 
 import os
@@ -12,47 +12,52 @@ SKYCORE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DIST_DIR = os.path.join(SKYCORE_ROOT, "dist")
 STAGE_DIR = os.path.join(DIST_DIR, "stage")
 FOMOD_DIR = os.path.join(STAGE_DIR, "fomod")
-PLUGINS_DIR = os.path.join(STAGE_DIR, "SKSE", "Plugins")
+CORE_DIR = os.path.join(STAGE_DIR, "00_Core")
+COMPAT_DIR = os.path.join(STAGE_DIR, "01_Compatibility_po3_Tweaks")
 BUILD_DLL = os.path.join(SKYCORE_ROOT, "build", "SkyCore.dll")
+
+VERSION = "0.3.7"
 
 def create_fomod_package():
     if os.path.exists(STAGE_DIR):
         shutil.rmtree(STAGE_DIR)
+        
     os.makedirs(FOMOD_DIR, exist_ok=True)
-    os.makedirs(PLUGINS_DIR, exist_ok=True)
+    os.makedirs(os.path.join(CORE_DIR, "SKSE", "Plugins"), exist_ok=True)
+    os.makedirs(os.path.join(CORE_DIR, "scripts"), exist_ok=True)
+    os.makedirs(os.path.join(CORE_DIR, "Interface", "Translations"), exist_ok=True)
+    os.makedirs(os.path.join(CORE_DIR, "MCM", "Config", "SkyCore"), exist_ok=True)
+    os.makedirs(os.path.join(CORE_DIR, "MCM", "Settings"), exist_ok=True)
+    os.makedirs(os.path.join(COMPAT_DIR, "scripts"), exist_ok=True)
 
-    info_xml = """<fomod>
-  <Name>Skyrim Engine Core (SEC) - Unified Engine, Display &amp; Tweaks Suite</Name>
+    info_xml = f"""<fomod>
+  <Name>Skyrim Engine Core (SEC) - Unified Master Engine Suite</Name>
   <Author>Nicol</Author>
-  <Version>0.3.6</Version>
-  <Description>Unified master engine suite for Skyrim AE 1.7.104+. Directly replaces SSE Engine Fixes (Nexus #17230), SSE Display Tweaks (Nexus #34705), powerofthree's Tweaks (Nexus #51073), and Actor Limit Fix (Nexus #32349). Provides native Papyrus compatibility hooks so third-party mods operate seamlessly without legacy DLL dependencies.</Description>
+  <Version>{VERSION}</Version>
+  <Description>Unified master engine suite for Skyrim AE 1.7.104+. Directly replaces SSE Engine Fixes (Nexus #17230), SSE Display Tweaks (Nexus #34705), powerofthree's Tweaks (Nexus #51073), and Actor Limit Fix (Nexus #32349). Native Papyrus compatibility hooks and optional script stubs ensure seamless compatibility with dependent mods.</Description>
   <Website>https://github.com/OpenChatGit/SkyrimEngineCore</Website>
 </fomod>"""
 
-    module_config_xml = """<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://qconsulting.ca/fo3/ModConfig5.0.xsd">
-  <moduleName>Skyrim Engine Core (SEC) - Unified Engine, Display &amp; Tweaks Suite</moduleName>
+    module_config_xml = f"""<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://qconsulting.ca/fo3/ModConfig5.0.xsd">
+  <moduleName>Skyrim Engine Core (SEC)</moduleName>
+  <requiredInstallFiles>
+    <folder source="00_Core" destination="" priority="0"/>
+  </requiredInstallFiles>
   <installSteps order="Explicit">
-    <installStep name="Unified Engine Architecture">
+    <installStep name="Third-Party Mod Compatibility">
       <optionalFileGroups order="Explicit">
-        <group name="Integrated Engine &amp; Tweaks Components" type="SelectAny">
+        <group name="Legacy Mod Script Stubs" type="SelectAny">
           <plugins order="Explicit">
-            <plugin name="Skyrim Engine Core (Unified Master Suite)">
-              <description>Installs the complete unified engine suite. Natively replaces:
-- SSE Engine Fixes (Nexus #17230): MaxStdIO 8192 file handles, SafeExit, Memory patch
-- SSE Display Tweaks (Nexus #34705): High-refresh Havok physics, borderless fullscreen
-- powerofthree's Tweaks (Nexus #51073): Native Papyrus IsTweakInstalled hook
-- Actor Limit Fix (Nexus #32349): 256 NPC mover limit &amp; 64 lip-sync face morphs
-
-VORTEX NOTE: If any other mod asks for SSE Engine Fixes or po3_Tweaks, you can safely select 'Dismiss / Ignore' in Vortex.</description>
+            <plugin name="po3_Tweaks Papyrus Script Stub (Recommended)">
+              <description>Installs the compiled Papyrus interface script (po3_Tweaks.pex).
+Select this if you use mods that query po3_Tweaks via Papyrus (e.g. True Directional Movement, Precision).
+SkyCore.dll natively handles all tweak queries at the engine level.</description>
               <image path=""/>
               <typeHandling>
-                <defaultType name="Required"/>
+                <defaultType name="Recommended"/>
               </typeHandling>
               <files>
-                <file source="SkyCore.esp" destination="SkyCore.esp" priority="0"/>
-                <folder source="SKSE" destination="SKSE" priority="0"/>
-                <folder source="scripts" destination="scripts" priority="0"/>
-                <folder source="MCM" destination="MCM" priority="0"/>
+                <folder source="01_Compatibility_po3_Tweaks" destination="" priority="1"/>
               </files>
             </plugin>
           </plugins>
@@ -69,7 +74,7 @@ VORTEX NOTE: If any other mod asks for SSE Engine Fixes or po3_Tweaks, you can s
         f.write(module_config_xml)
 
     default_toml = """# =====================================================================
-# SkyCore - Unified Engine & Display Suite for Skyrim AE 1.7.104+
+# Skyrim Engine Core (SEC) - Unified Engine Suite for Skyrim AE 1.7.104+
 # Author: Nicol
 # All fixes integrated natively in a single, high-performance module.
 # =====================================================================
@@ -108,7 +113,7 @@ iMerchantGoldCap = 25000          # Obergrenze (verhindert 32k Überlauf-Bug)
 bEnableCrashLogging = true        # Built-in lightweight crash handler with register and module dump
 bVerboseLogging = false           # Detailed debug logs in Documents\\My Games\\Skyrim Special Edition\\SKSE\\SkyCore.log
 """
-    with open(os.path.join(PLUGINS_DIR, "SkyCore.toml"), "w", encoding="utf-8") as f:
+    with open(os.path.join(CORE_DIR, "SKSE", "Plugins", "SkyCore.toml"), "w", encoding="utf-8") as f:
         f.write(default_toml)
 
     # Copy built native DLL
@@ -119,7 +124,7 @@ bVerboseLogging = false           # Detailed debug logs in Documents\\My Games\\
         if not os.path.exists(src_dll):
             src_dll = os.path.join(game_plugins_dir, dll_name)
         if os.path.exists(src_dll):
-            dest_dll = os.path.join(PLUGINS_DIR, dll_name)
+            dest_dll = os.path.join(CORE_DIR, "SKSE", "Plugins", dll_name)
             shutil.copy2(src_dll, dest_dll)
             print(f"[+] Successfully copied: {dll_name} ({os.path.getsize(dest_dll)} bytes)")
         else:
@@ -130,26 +135,21 @@ bVerboseLogging = false           # Detailed debug logs in Documents\\My Games\\
     if not os.path.exists(esp_src):
         esp_src = os.path.join(SKYCORE_ROOT, "..", "Data", "SkyCore.esp")
     if os.path.exists(esp_src):
-        shutil.copy2(esp_src, os.path.join(STAGE_DIR, "SkyCore.esp"))
+        shutil.copy2(esp_src, os.path.join(CORE_DIR, "SkyCore.esp"))
         print("[+] Successfully bundled SkyCore.esp")
 
     # Copy Papyrus scripts
-    stage_scripts = os.path.join(STAGE_DIR, "scripts")
-    os.makedirs(stage_scripts, exist_ok=True)
     for pex_name in ["SkyCore_MCM.pex"]:
         pex_src = os.path.join(SKYCORE_ROOT, "assets", "scripts", pex_name)
         if not os.path.exists(pex_src):
             pex_src = os.path.join(SKYCORE_ROOT, "..", "Data", "scripts", pex_name)
         if os.path.exists(pex_src):
-            shutil.copy2(pex_src, os.path.join(stage_scripts, pex_name))
+            shutil.copy2(pex_src, os.path.join(CORE_DIR, "scripts", pex_name))
             print(f"[+] Successfully bundled scripts/{pex_name}")
 
     # Copy MCM Helper config and settings
-    mcm_config_dir = os.path.join(STAGE_DIR, "MCM", "Config", "SkyCore")
-    mcm_settings_dir = os.path.join(STAGE_DIR, "MCM", "Settings")
-    os.makedirs(mcm_config_dir, exist_ok=True)
-    os.makedirs(mcm_settings_dir, exist_ok=True)
-    
+    mcm_config_dir = os.path.join(CORE_DIR, "MCM", "Config", "SkyCore")
+    mcm_settings_dir = os.path.join(CORE_DIR, "MCM", "Settings")
     for filename in ["config.json", "settings.ini"]:
         src = os.path.join(SKYCORE_ROOT, "assets", "MCM", "Config", "SkyCore", filename)
         if not os.path.exists(src):
@@ -165,8 +165,24 @@ bVerboseLogging = false           # Detailed debug logs in Documents\\My Games\\
         shutil.copy2(src_settings, os.path.join(mcm_settings_dir, "SkyCore.ini"))
         print("[+] Successfully bundled MCM/Settings/SkyCore.ini")
 
+    # Copy Interface translations
+    trans_src_dir = os.path.join(SKYCORE_ROOT, "assets", "Interface", "Translations")
+    dest_trans_dir = os.path.join(CORE_DIR, "Interface", "Translations")
+    if os.path.exists(trans_src_dir):
+        for trans_file in os.listdir(trans_src_dir):
+            shutil.copy2(os.path.join(trans_src_dir, trans_file), os.path.join(dest_trans_dir, trans_file))
+            print(f"[+] Successfully bundled Translations/{trans_file}")
+
+    # Copy optional po3_Tweaks compatibility script stub
+    compat_script_src = os.path.join(SKYCORE_ROOT, "assets", "compat", "scripts", "po3_Tweaks.pex")
+    if not os.path.exists(compat_script_src):
+        compat_script_src = os.path.join(SKYCORE_ROOT, "3rd-party", "po3-Tweaks", "Skyrim", "Data", "scripts", "po3_Tweaks.pex")
+    if os.path.exists(compat_script_src):
+        shutil.copy2(compat_script_src, os.path.join(COMPAT_DIR, "scripts", "po3_Tweaks.pex"))
+        print("[+] Successfully bundled optional po3_Tweaks.pex compatibility stub")
+
     # Create zip archive for Vortex / Mod Organizer 2
-    zip_path = os.path.join(DIST_DIR, "SkyrimEngineCore-v0.3.6-AE.zip")
+    zip_path = os.path.join(DIST_DIR, f"SkyrimEngineCore-v{VERSION}-AE.zip")
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
         for root, _, files in os.walk(STAGE_DIR):
             for file in files:
@@ -174,7 +190,7 @@ bVerboseLogging = false           # Detailed debug logs in Documents\\My Games\\
                 rel_path = os.path.relpath(abs_file, STAGE_DIR)
                 zf.write(abs_file, rel_path)
 
-    print(f"[+] Vortex-ready FOMOD archive created successfully:")
+    print(f"[+] Vortex-ready modular FOMOD archive created successfully:")
     print(f"    -> {zip_path} ({os.path.getsize(zip_path)} bytes)")
 
 if __name__ == "__main__":
