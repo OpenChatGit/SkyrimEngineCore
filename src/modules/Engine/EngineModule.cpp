@@ -1,3 +1,24 @@
+/**
+ * Skyrim Engine Core (SkyCore) - EngineModule
+ *
+ * This module incorporates modified and adapted logic from the following open-source projects:
+ *
+ * 1. SSE Engine Fixes (MIT License)
+ *    Copyright (c) 2018-2021 aers, Nukem, Ryan (fudgyduff)
+ *    Modified and adapted for Skyrim Engine Core:
+ *    - MaxStdIO file handle expansion
+ *    - CleanSKSECoSaves orphaned co-save purger
+ *
+ * 2. powerofthree's Tweaks (GNU General Public License v3.0)
+ *    Copyright (c) powerofthree
+ *    Modified and adapted for Skyrim Engine Core:
+ *    - BSTempEffectNiRTTI fix
+ *    - EffectShaderZBuffer fix
+ *    - CellInit fix
+ *
+ * All derived code has been adapted, modified, and integrated into SkyCore under their respective licenses.
+ */
+
 #include "EngineModule.h"
 #include "SkyCore/Config.h"
 #include "RE/B/BarterMenu.h"

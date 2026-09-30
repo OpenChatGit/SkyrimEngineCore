@@ -13,7 +13,6 @@ DIST_DIR = os.path.join(SKYCORE_ROOT, "dist")
 STAGE_DIR = os.path.join(DIST_DIR, "stage")
 FOMOD_DIR = os.path.join(STAGE_DIR, "fomod")
 CORE_DIR = os.path.join(STAGE_DIR, "00_Core")
-COMPAT_DIR = os.path.join(STAGE_DIR, "01_Compatibility_po3_Tweaks")
 BUILD_DLL = os.path.join(SKYCORE_ROOT, "build", "SkyCore.dll")
 
 VERSION = "0.4.0"
@@ -24,11 +23,9 @@ def create_fomod_package():
         
     os.makedirs(FOMOD_DIR, exist_ok=True)
     os.makedirs(os.path.join(CORE_DIR, "SKSE", "Plugins"), exist_ok=True)
-    os.makedirs(os.path.join(CORE_DIR, "scripts"), exist_ok=True)
     os.makedirs(os.path.join(CORE_DIR, "Interface", "Translations"), exist_ok=True)
     os.makedirs(os.path.join(CORE_DIR, "MCM", "Config", "SkyCore"), exist_ok=True)
     os.makedirs(os.path.join(CORE_DIR, "MCM", "Settings"), exist_ok=True)
-    os.makedirs(os.path.join(COMPAT_DIR, "scripts"), exist_ok=True)
 
     info_xml = f"""<fomod>
   <Name>Skyrim Engine Core (SEC) - Unified Master Engine Suite</Name>
@@ -44,27 +41,6 @@ def create_fomod_package():
   <requiredInstallFiles>
     <folder source="00_Core" destination="" priority="0"/>
   </requiredInstallFiles>
-  <installSteps order="Explicit">
-    <installStep name="Third-Party Mod Compatibility">
-      <optionalFileGroups order="Explicit">
-        <group name="Legacy Mod Script Stubs" type="SelectAny">
-          <plugins order="Explicit">
-            <plugin name="po3_Tweaks Papyrus Script Stub (Recommended)">
-              <description>Installs the compiled Papyrus interface script (po3_Tweaks.pex).
-Select this if you use mods that query po3_Tweaks via Papyrus (e.g. True Directional Movement, Precision).
-SkyCore.dll natively handles all tweak queries at the engine level.</description>
-              <files>
-                <folder source="01_Compatibility_po3_Tweaks" destination="" priority="1"/>
-              </files>
-              <typeDescriptor>
-                <type name="Recommended"/>
-              </typeDescriptor>
-            </plugin>
-          </plugins>
-        </group>
-      </optionalFileGroups>
-    </installStep>
-  </installSteps>
 </config>"""
 
     with open(os.path.join(FOMOD_DIR, "info.xml"), "w", encoding="utf-8") as f:
@@ -137,15 +113,6 @@ bVerboseLogging = false           # Detailed debug logs in Documents\\My Games\\
         shutil.copy2(esp_src, os.path.join(CORE_DIR, "SkyCore.esp"))
         print("[+] Successfully bundled SkyCore.esp")
 
-    # Copy Papyrus scripts
-    for pex_name in ["SkyCore_MCM.pex"]:
-        pex_src = os.path.join(SKYCORE_ROOT, "assets", "scripts", pex_name)
-        if not os.path.exists(pex_src):
-            pex_src = os.path.join(SKYCORE_ROOT, "..", "Data", "scripts", pex_name)
-        if os.path.exists(pex_src):
-            shutil.copy2(pex_src, os.path.join(CORE_DIR, "scripts", pex_name))
-            print(f"[+] Successfully bundled scripts/{pex_name}")
-
     # Copy MCM Helper config and settings
     mcm_config_dir = os.path.join(CORE_DIR, "MCM", "Config", "SkyCore")
     mcm_settings_dir = os.path.join(CORE_DIR, "MCM", "Settings")
@@ -171,14 +138,6 @@ bVerboseLogging = false           # Detailed debug logs in Documents\\My Games\\
         for trans_file in os.listdir(trans_src_dir):
             shutil.copy2(os.path.join(trans_src_dir, trans_file), os.path.join(dest_trans_dir, trans_file))
             print(f"[+] Successfully bundled Translations/{trans_file}")
-
-    # Copy optional po3_Tweaks compatibility script stub
-    compat_script_src = os.path.join(SKYCORE_ROOT, "assets", "compat", "scripts", "po3_Tweaks.pex")
-    if not os.path.exists(compat_script_src):
-        compat_script_src = os.path.join(SKYCORE_ROOT, "3rd-party", "po3-Tweaks", "Skyrim", "Data", "scripts", "po3_Tweaks.pex")
-    if os.path.exists(compat_script_src):
-        shutil.copy2(compat_script_src, os.path.join(COMPAT_DIR, "scripts", "po3_Tweaks.pex"))
-        print("[+] Successfully bundled optional po3_Tweaks.pex compatibility stub")
 
     # Copy LICENSE into root of distribution
     license_src = os.path.join(SKYCORE_ROOT, "LICENSE")

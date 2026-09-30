@@ -40,13 +40,13 @@
 
 ### Vortex Users
 1. Download `SkyrimEngineCore-v0.4.0-AE.zip` and drop it into Vortex (or click *Install with Mod Manager*).
-2. The FOMOD installer will automatically select the **Core Engine Suite** and the recommended **po3_Tweaks Papyrus Script Stub**.
+2. The FOMOD installer will install the **Core Engine Suite**.
 3. Enable and Deploy the mod.
 4. **Vortex Dependency FAQ:** If Vortex displays a notification that another mod recommends *SSE Engine Fixes* or *powerofthree's Tweaks*, simply click **"Dismiss / Don't remind me"** (or create a rule *"Replaced by Skyrim Engine Core"*). Skyrim Engine Core satisfies these dependencies directly at the engine level.
 
 ### Mod Organizer 2 (MO2) Users
 1. Install the archive via the *Install Mod* icon or drag-and-drop.
-2. Confirm the FOMOD options in the installer dialog.
+2. Confirm the installation in the dialog.
 3. Check the box to activate the mod in your left pane load order.
 
 ---
@@ -66,7 +66,8 @@ This project is licensed under the **GNU General Public License v3.0 (GPLv3)**.
 
 All research, open-source logic, and memory reverse-engineering utilized in this project operate strictly within the legal scope of the **GNU General Public License v3.0** and the **MIT License**.
 
-Acknowledgements to the open-source reverse-engineering community:
-- aers, Nukem, Ryan (fudgyduff)
-- powerofthree
-- ianpatt, behippo, scripthoge, CharmedBaryon
+Acknowledgements & Notices:
+- **SSE Engine Fixes** (MIT License) - Copyright (c) 2018-2021 aers, Nukem, Ryan (fudgyduff). Portions adapted and modified.
+- **powerofthree's Tweaks** (GPL-3.0 License) - Copyright (c) powerofthree. Portions adapted and modified.
+- **SKSE Team & CommonLibSSE-NG** - Copyright (c) ianpatt, behippo, scripthoge, CharmedBaryon.
+- Full license terms and verbatim notices for all dependencies are provided in the `LICENSE` file.
