@@ -26,6 +26,7 @@
 | **Dynamic Havok High-FPS Physics** |  **Integrated** | Physics delta unlocked up to 240 FPS |
 | **Native Borderless Fullscreen** |  **Integrated** | Win32 borderless monitor bounds positioning |
 | **V-Sync Override & Frame Timing** |  **Integrated** | DXGI SwapChain Present hook for unlocked tearing |
+| **Dual-Stage Framerate Limiter** |  **Integrated** | Unlocked 3D gameplay + smooth 60 FPS menu limiter |
 | **Native In-Game FPS Counter** |  **Integrated** | Transparent click-through HUD overlay (Insert toggle) |
 | **Dynamic Merchant Gold Scaling** |  **Integrated** | Organically scales merchant gold with player speech |
 | **Clean SKSE Co-Saves** |  **Integrated** | Automatically purges orphaned .skse save files |
@@ -39,7 +40,7 @@
 ## ✦ Installation Guide
 
 ### Vortex Users
-1. Download `SkyrimEngineCore-v0.4.0-AE.zip` and drop it into Vortex (or click *Install with Mod Manager*).
+1. Download `SkyrimEngineCore-v0.4.1-AE.zip` and drop it into Vortex (or click *Install with Mod Manager*).
 2. The FOMOD installer will install the **Core Engine Suite**.
 3. Enable and Deploy the mod.
 4. **Vortex Dependency FAQ:** If Vortex displays a notification that another mod recommends *SSE Engine Fixes* or *powerofthree's Tweaks*, simply click **"Dismiss / Don't remind me"** (or create a rule *"Replaced by Skyrim Engine Core"*). Skyrim Engine Core satisfies these dependencies directly at the engine level.

@@ -73,6 +73,27 @@
             "max": 360,
             "step": 5
           }
+        },
+        {
+          "id": "bLimitUIFPS:Display",
+          "text": "$SkyCore_LimitUIFPS",
+          "help": "$SkyCore_LimitUIFPS_Help",
+          "type": "toggle",
+          "valueOptions": {
+            "sourceType": "ModSettingBool"
+          }
+        },
+        {
+          "id": "iTargetFPS_UI:Display",
+          "text": "$SkyCore_TargetFPS_UI",
+          "help": "$SkyCore_TargetFPS_UI_Help",
+          "type": "slider",
+          "valueOptions": {
+            "sourceType": "ModSettingInt",
+            "min": 30,
+            "max": 240,
+            "step": 5
+          }
         }
       ]
     },

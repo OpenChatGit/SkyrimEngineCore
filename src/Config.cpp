@@ -80,7 +80,9 @@ namespace SkyCore
             if (key == "bBorderlessFullscreen") borderlessFullscreen = isTrue;
             else if (key == "bDynamicHavok") dynamicHavok = isTrue;
             else if (key == "bDisableVSync") disableVSync = isTrue;
-            else if (key == "iTargetFPS") targetFPS = std::stoi(val);
+            else if (key == "iTargetFPS") { try { targetFPS = std::stoi(val); } catch (...) {} }
+            else if (key == "iTargetFPS_UI" || key == "iTargetFPSUI") { try { targetFPS_UI = std::stoi(val); } catch (...) {} }
+            else if (key == "bLimitUIFPS") limitUIFPS = isTrue;
             else if (key == "bSafeExit") safeExit = isTrue;
             else if (key == "bMaxStdIO") maxStdIO = isTrue;
             else if (key == "bCleanSKSECoSaves") cleanSKSECoSaves = isTrue;

@@ -9,7 +9,9 @@ namespace SkyCore
         // [Display]
         bool borderlessFullscreen{ true };
         bool disableVSync{ false };
-        int  targetFPS{ 0 }; // 0 = unlimited / native display rate
+        int  targetFPS{ 0 };     // 0 = unlimited / native display rate
+        int  targetFPS_UI{ 60 };  // 60 FPS cap in menus to eliminate Scaleform lag & input floatiness
+        bool limitUIFPS{ true };  // Enables UI menu framerate limiter
         bool dynamicHavok{ true };
 
         // [Engine]

@@ -4,9 +4,9 @@ namespace SkyCore::Version
 {
     inline constexpr std::size_t MAJOR = 0;
     inline constexpr std::size_t MINOR = 4;
-    inline constexpr std::size_t PATCH = 0;
+    inline constexpr std::size_t PATCH = 1;
 
     inline constexpr auto NAME = "Skyrim Engine Core (SEC)";
     inline constexpr auto AUTHOR = "Nicol";
-    inline constexpr auto VERSION_STRING = "0.4.0";
+    inline constexpr auto VERSION_STRING = "0.4.1";
 }

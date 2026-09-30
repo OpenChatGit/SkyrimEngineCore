@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.20)
 
 project(
     SkyCore
-    VERSION 0.4.0
+    VERSION 0.4.1
     LANGUAGES CXX
 )
 

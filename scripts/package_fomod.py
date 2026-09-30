@@ -15,7 +15,7 @@ FOMOD_DIR = os.path.join(STAGE_DIR, "fomod")
 CORE_DIR = os.path.join(STAGE_DIR, "00_Core")
 BUILD_DLL = os.path.join(SKYCORE_ROOT, "build", "SkyCore.dll")
 
-VERSION = "0.4.0"
+VERSION = "0.4.1"
 
 def create_fomod_package():
     if os.path.exists(STAGE_DIR):
@@ -60,6 +60,8 @@ bBorderlessFullscreen = true      # Eliminates DXGI occlusion black screens on d
 bDynamicHavok = true              # Smooth high-refresh physics scaling (prevents Havok glitching >60 FPS)
 iTargetFPS = 0                    # Framerate limit (0 = display native / unlimited)
 bDisableVSync = true              # Set true to unlock tearing-free high FPS
+bLimitUIFPS = true                # Enable UI menu framerate limiter (eliminates 1000+ FPS menu input lag)
+iTargetFPS_UI = 60                # Framerate cap in menus & UI (60 FPS recommended for smooth mouse polling)
 
 [Engine]
 bSafeExit = true                  # Instant, clean game shutdown without freezing

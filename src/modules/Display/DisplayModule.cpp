@@ -12,12 +12,16 @@
 #include <thread>
 #include <chrono>
 #include <windows.h>
+#include "RE/J/JournalMenu.h"
+#include "RE/M/MenuOpenCloseEvent.h"
 #include <d3d11.h>
 #include <dxgi.h>
+#include <timeapi.h>
 
 #pragma comment(lib, "gdi32.lib")
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "dxgi.lib")
+#pragma comment(lib, "winmm.lib")
 
 namespace SkyCore::Modules::Display
 {
@@ -27,6 +31,8 @@ namespace SkyCore::Modules::Display
         uint32_t toggleKey{ 0xD2 }; // DX scan code 0xD2 = Insert = 210
         bool disableVSync{ true };
         int  targetFPS{ 0 };
+        int  targetFPS_UI{ 60 };
+        bool limitUIFPS{ true };
     };
 
     static std::atomic<uint32_t> s_activeToggleKey{ 0xD2 };
@@ -60,17 +66,14 @@ namespace SkyCore::Modules::Display
         return GetSkyrimRoot() / "Data" / "MCM" / "Settings" / "SkyCore.ini";
     }
 
-    static std::filesystem::path GetDisplayTweaksIniPath()
-    {
-        return GetSkyrimRoot() / "Data" / "SKSE" / "Plugins" / "SSEDisplayTweaks.ini";
-    }
-
     static MCMDisplaySettings ReadMCMSettings()
     {
         MCMDisplaySettings out;
         const auto& cfg = Config::Get();
         out.disableVSync = cfg.disableVSync;
         out.targetFPS = cfg.targetFPS;
+        out.targetFPS_UI = cfg.targetFPS_UI;
+        out.limitUIFPS = cfg.limitUIFPS;
 
         const auto mcmIni = GetMCMIniPath();
         std::ifstream file(mcmIni);
@@ -111,6 +114,10 @@ namespace SkyCore::Modules::Display
                     out.disableVSync = (val == "1" || val == "true");
                 } else if (key == "iTargetFPS") {
                     try { out.targetFPS = std::stoi(val); } catch (...) {}
+                } else if (key == "iTargetFPS_UI" || key == "iTargetFPSUI") {
+                    try { out.targetFPS_UI = std::stoi(val); } catch (...) {}
+                } else if (key == "bLimitUIFPS") {
+                    out.limitUIFPS = (val == "1" || val == "true");
                 }
             } else if (currentSection == "[Engine]") {
                 if (key == "bAltF4QuitFix" || key == "altf4quitfix") {
@@ -119,46 +126,6 @@ namespace SkyCore::Modules::Display
             }
         }
         return out;
-    }
-
-    static uint32_t ReadActiveKeyFromIni()
-    {
-        const auto mcmIni = GetMCMIniPath();
-        std::ifstream file(mcmIni);
-        if (!file.is_open())
-            return s_activeToggleKey.load();
-
-        std::string line;
-        bool inDisplay = false;
-        while (std::getline(file, line)) {
-            const auto c = line.find('#');
-            if (c != std::string::npos) line = line.substr(0, c);
-            const auto cs = line.find(';');
-            if (cs != std::string::npos) line = line.substr(0, cs);
-            line = Trim(line);
-            if (line.empty()) continue;
-
-            if (line.starts_with('[')) {
-                inDisplay = (line == "[Display]");
-                continue;
-            }
-            if (!inDisplay) continue;
-
-            const auto eq = line.find('=');
-            if (eq == std::string::npos) continue;
-            auto key = Trim(line.substr(0, eq));
-            auto val = Trim(line.substr(eq + 1));
-
-            if (key == "iToggleKey") {
-                try {
-                    int parsed = std::stoi(val);
-                    if (parsed >= 0) {
-                        return static_cast<uint32_t>(parsed);
-                    }
-                } catch (...) {}
-            }
-        }
-        return s_activeToggleKey.load();
     }
 
     // -----------------------------------------------------------------------
@@ -191,14 +158,22 @@ namespace SkyCore::Modules::Display
             s_lastFPSTime = now;
         }
 
-        // 3. Optional Framerate Limiter
-        const int targetFPS = Config::Get().targetFPS;
-        if (targetFPS > 0) {
-            const float targetFrameTime = 1.0f / static_cast<float>(targetFPS);
+        // 3. Dual-Stage Framerate Limiter (Gameplay + Smooth UI Menu Cap)
+        int effectiveTargetFPS = Config::Get().targetFPS;
+        if (Config::Get().limitUIFPS) {
+            if (const auto ui = RE::UI::GetSingleton()) {
+                if (ui->numPausesGame > 0 || ui->IsApplicationMenuOpen() || ui->IsItemMenuOpen() || ui->GameIsPaused()) {
+                    effectiveTargetFPS = Config::Get().targetFPS_UI > 0 ? Config::Get().targetFPS_UI : 60;
+                }
+            }
+        }
+
+        if (effectiveTargetFPS > 0) {
+            const float targetFrameTime = 1.0f / static_cast<float>(effectiveTargetFPS);
             std::chrono::duration<float> frameElapsed = now - s_lastTime;
             while (frameElapsed.count() < targetFrameTime) {
                 float remain = targetFrameTime - frameElapsed.count();
-                if (remain > 0.002f) {
+                if (remain > 0.003f) {
                     std::this_thread::sleep_for(std::chrono::milliseconds(1));
                 } else {
                     std::this_thread::yield();
@@ -462,78 +437,46 @@ namespace SkyCore::Modules::Display
     static void RefreshMCMSettings()
     {
         const auto mcm = ReadMCMSettings();
-        const auto oldKey = s_activeToggleKey.exchange(mcm.toggleKey);
+        auto& cfg = Config::Get();
+        cfg.disableVSync = mcm.disableVSync;
+        cfg.targetFPS = mcm.targetFPS;
+        cfg.targetFPS_UI = mcm.targetFPS_UI;
+        cfg.limitUIFPS = mcm.limitUIFPS;
 
+        const auto oldKey = s_activeToggleKey.exchange(mcm.toggleKey);
         if (oldKey != mcm.toggleKey) {
             logger::info("DisplayModule: Active Hotkey updated from MCM => {} (was {})", mcm.toggleKey, oldKey);
         }
 
         SetOSDVisible(mcm.showFPS);
+        logger::info("DisplayModule: MCM display settings refreshed (VSync={}, TargetFPS={}, TargetUIFPS={}, LimitUIFPS={})",
+            cfg.disableVSync, cfg.targetFPS, cfg.targetFPS_UI, cfg.limitUIFPS);
     }
 
     // -----------------------------------------------------------------------
-    // Patch SSEDisplayTweaks.ini (Optional synchronization if present)
+    // Menu Event Watcher for Zero-Lag, Real-Time MCM Hotkey & Setting Sync
     // -----------------------------------------------------------------------
-    static void PatchDisplayTweaks(const MCMDisplaySettings& mcm)
+    class MenuWatcher : public RE::BSTEventSink<RE::MenuOpenCloseEvent>
     {
-        const auto iniPath = GetDisplayTweaksIniPath();
-        if (!std::filesystem::exists(iniPath)) {
-            return;
-        }
-
-        const auto& cfg = Config::Get();
-        std::vector<std::string> lines;
+    public:
+        static MenuWatcher* GetSingleton()
         {
-            std::ifstream in(iniPath);
-            std::string l;
-            while (std::getline(in, l)) lines.push_back(l);
+            static MenuWatcher instance;
+            return &instance;
         }
 
-        char hexBuf[16];
-        std::snprintf(hexBuf, sizeof(hexBuf), "0x%02X", static_cast<unsigned>(mcm.toggleKey));
-
-        std::string currentSection;
-        for (auto& l : lines) {
-            const std::string trimmed = Trim(l);
-            if (trimmed.starts_with('[') && trimmed.ends_with(']')) {
-                currentSection = trimmed;
-                continue;
-            }
-
-            if (currentSection == "[Render]") {
-                if (trimmed.starts_with("EnableVSync")) {
-                    l = std::string("EnableVSync=") + (mcm.disableVSync ? "false" : "true");
-                } else if (trimmed.starts_with("EnableTearing")) {
-                    l = "EnableTearing=true";
-                } else if (trimmed.starts_with("FramerateLimit=")) {
-                    l = std::string("FramerateLimit=") + (mcm.targetFPS > 0 ? std::to_string(mcm.targetFPS) : "0");
-                } else if (trimmed.starts_with("Fullscreen=")) {
-                    l = std::string("Fullscreen=") + (cfg.borderlessFullscreen ? "false" : "true");
-                } else if (trimmed.starts_with("Borderless=")) {
-                    l = std::string("Borderless=") + (cfg.borderlessFullscreen ? "true" : "false");
-                }
-            } else if (currentSection == "[HAVOK]") {
-                if (trimmed.starts_with("DynamicMaxTimeScaling")) {
-                    l = std::string("DynamicMaxTimeScaling=") + (cfg.dynamicHavok ? "true" : "false");
-                }
-            } else if (currentSection == "[OSD]") {
-                if (trimmed.starts_with("InitiallyOn")) {
-                    l = std::string("InitiallyOn=") + (mcm.showFPS ? "true" : "false");
-                } else if (trimmed.starts_with("ComboKey")) {
-                    l = "ComboKey=0";
-                } else if (trimmed.starts_with("ToggleKey")) {
-                    l = std::string("ToggleKey=") + hexBuf;
-                }
-            }
-        }
-
+        RE::BSEventNotifyControl ProcessEvent(
+            const RE::MenuOpenCloseEvent* a_event,
+            [[maybe_unused]] RE::BSTEventSource<RE::MenuOpenCloseEvent>* a_eventSource) override
         {
-            std::ofstream out(iniPath, std::ios::trunc);
-            for (const auto& l : lines) {
-                out << l << '\n';
+            if (a_event && !a_event->opening) {
+                if (a_event->menuName == RE::JournalMenu::MENU_NAME) {
+                    RefreshMCMSettings();
+                }
             }
+            return RE::BSEventNotifyControl::kContinue;
         }
-    }
+    };
 
     // -----------------------------------------------------------------------
     // Windows Message Subclass for Alt+F4, WM_CLOSE & Borderless Maintenance
@@ -763,17 +706,6 @@ namespace SkyCore::Modules::Display
                     ToggleFPS();
                     break;
                 }
-
-                // Check dynamic keymap from INI
-                uint32_t iniKey = ReadActiveKeyFromIni();
-                if (iniKey != active) {
-                    s_activeToggleKey.store(iniKey);
-                    logger::info("DisplayModule: Active Hotkey updated from INI => {} (was {})", iniKey, active);
-                    if (keyCode == iniKey) {
-                        ToggleFPS();
-                        break;
-                    }
-                }
             }
 
             return RE::BSEventNotifyControl::kContinue;
@@ -785,32 +717,22 @@ namespace SkyCore::Modules::Display
     // -----------------------------------------------------------------------
     void Install()
     {
+        // 1. High-resolution multimedia timer (ensures 1ms timer precision for smooth frame limiter)
+        timeBeginPeriod(1);
+
         auto& cfg = Config::Get();
 
         // Read MCM-persisted display settings
         const auto mcm = ReadMCMSettings();
         cfg.disableVSync = mcm.disableVSync;
         cfg.targetFPS = mcm.targetFPS;
+        cfg.targetFPS_UI = mcm.targetFPS_UI;
+        cfg.limitUIFPS = mcm.limitUIFPS;
         s_showFPS.store(mcm.showFPS);
         s_activeToggleKey.store(mcm.toggleKey);
 
-        logger::info("DisplayModule: Active Settings => bShowFPS={}, bDisableVSync={}, iTargetFPS={}, bDynamicHavok={}, bBorderlessFullscreen={}, iToggleKey={}",
-            mcm.showFPS, cfg.disableVSync, cfg.targetFPS, cfg.dynamicHavok, cfg.borderlessFullscreen, mcm.toggleKey);
-
-        // Propagate settings to DisplayTweaks INI if present
-        PatchDisplayTweaks(mcm);
-
-        // Disable SSEDisplayTweaks internal KeyPressHandler if loaded to prevent fighting
-        const uintptr_t sdtBase = reinterpret_cast<uintptr_t>(GetModuleHandleA("SSEDisplayTweaks.dll"));
-        if (sdtBase) {
-            auto patchAddr = reinterpret_cast<uint8_t*>(sdtBase + 0x1E690);
-            DWORD oldProtect;
-            if (VirtualProtect(patchAddr, 1, PAGE_EXECUTE_READWRITE, &oldProtect)) {
-                *patchAddr = 0xC3; // ret
-                VirtualProtect(patchAddr, 1, oldProtect, &oldProtect);
-                logger::info("DisplayModule: Disabled SSEDisplayTweaks internal OnKeyPressed at RVA 0x1E690");
-            }
-        }
+        logger::info("DisplayModule: Active Settings => bShowFPS={}, bDisableVSync={}, iTargetFPS={}, iTargetFPS_UI={}, bLimitUIFPS={}, bDynamicHavok={}, bBorderlessFullscreen={}, iToggleKey={}",
+            mcm.showFPS, cfg.disableVSync, cfg.targetFPS, cfg.targetFPS_UI, cfg.limitUIFPS, cfg.dynamicHavok, cfg.borderlessFullscreen, mcm.toggleKey);
     }
 
     void OnDataLoaded()
@@ -870,6 +792,12 @@ namespace SkyCore::Modules::Display
 
         // 4. Hook swapchain and initialize overlay
         TryHookDisplay();
+
+        // 5. Register MenuWatcher for seamless MCM setting updates on menu close
+        if (const auto ui = RE::UI::GetSingleton()) {
+            ui->AddEventSink(MenuWatcher::GetSingleton());
+            logger::info("DisplayModule: Registered MenuWatcher event sink for seamless MCM updates.");
+        }
     }
 
     void OnInputLoaded()
